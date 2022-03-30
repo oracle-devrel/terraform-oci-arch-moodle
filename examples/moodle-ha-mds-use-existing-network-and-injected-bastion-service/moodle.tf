@@ -1,0 +1,37 @@
+## Copyright (c) 2022, Oracle and/or its affiliates. 
+## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
+
+module "oci-arch-moodle" {
+  source                          = "github.com/oracle-devrel/terraform-oci-arch-moodle"
+  tenancy_ocid                    = var.tenancy_ocid
+  vcn_id                          = oci_core_virtual_network.moodle_mds_vcn.id
+  numberOfNodes                   = 2
+  availability_domain_name        = var.availability_domain_name == "" ? lookup(data.oci_identity_availability_domains.ADs.availability_domains[0], "name") : var.availability_domain_name
+  compartment_ocid                = var.compartment_ocid
+  image_id                        = lookup(data.oci_core_images.InstanceImageOCID.images[0], "id")
+  shape                           = var.node_shape
+  ssh_authorized_keys             = var.ssh_public_key
+  mds_ip                          = module.mds-instance.mysql_db_system.ip_address
+  moodle_subnet_id                = oci_core_subnet.moodle_subnet.id
+  lb_subnet_id                    = oci_core_subnet.lb_subnet_public.id 
+  fss_subnet_id                   = oci_core_subnet.fss_subnet_private.id 
+  admin_password                  = var.admin_password
+  admin_username                  = var.admin_username
+  moodle_schema                   = var.moodle_schema
+  moodle_name                     = var.moodle_name
+  moodle_password                 = var.moodle_password
+  moodle_admin_user               = var.moodle_admin_user
+  moodle_admin_password           = var.moodle_admin_password
+  moodle_admin_email              = var.moodle_admin_email
+  moodle_site_fullname            = var.moodle_site_fullname
+  moodle_site_shortname           = var.moodle_site_shortname
+  lb_shape                        = var.lb_shape 
+  flex_lb_min_shape               = var.flex_lb_min_shape 
+  flex_lb_max_shape               = var.flex_lb_max_shape 
+  inject_bastion_service_id       = true
+  use_bastion_service             = true
+  inject_bastion_server_public_ip = false
+  bastion_service_id              = oci_bastion_bastion.bastion_service.id
+  bastion_service_region          = var.region
+}
+
