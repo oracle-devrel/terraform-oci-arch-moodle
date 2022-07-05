@@ -66,12 +66,12 @@ data "template_cloudinit_config" "cloud_init" {
 }
 
 locals {
-  php_script       = "~/install_php74.sh"
-  security_script  = "~/configure_local_security.sh"
-  create_moodle_db = "~/create_moodle_db.sh"
-  install_moodle   = "~/install_moodle.sh"
-  config_php       = "~/config.php"
-  indexhtml        = "~/index.html"  
+  php_script       = "/home/${var.vm_user}/install_php74.sh"
+  security_script  = "/home/${var.vm_user}/configure_local_security.sh"
+  create_moodle_db = "/home/${var.vm_user}/create_moodle_db.sh"
+  install_moodle   = "/home/${var.vm_user}/install_moodle.sh"
+  config_php       = "/home/${var.vm_user}/config.php"
+  indexhtml        = "/home/${var.vm_user}/index.html"
 }
 
 data "oci_core_subnet" "moodle_subnet_ds" {
@@ -349,6 +349,9 @@ resource "oci_core_public_ip" "moodle_public_ip_for_single_node" {
   #  private_ip_id  = var.numberOfNodes == 1 ? data.oci_core_private_ips.moodle_private_ips1.private_ips[0]["id"] : null
   private_ip_id = data.oci_core_private_ips.moodle_private_ips1.private_ips[0]["id"]
   defined_tags  = var.defined_tags
+  lifecycle {
+    ignore_changes = [defined_tags]
+  }
 }
 
 resource "oci_core_public_ip" "moodle_public_ip_for_multi_node" {
@@ -357,6 +360,9 @@ resource "oci_core_public_ip" "moodle_public_ip_for_multi_node" {
   display_name   = "moodle_public_ip_for_multi_node"
   lifetime       = "RESERVED"
   defined_tags   = var.defined_tags
+  lifecycle {
+    ignore_changes = [defined_tags]
+  }
 }
 
 data "template_file" "install_moodle" {
